@@ -2,14 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Telegram videov3</title>
+  <title>Telegram videov4</title>
 
   <style>
     body   {background:#111;color:#eee;text-align:center;font-family:sans-serif}
     video  {width:100%;max-width:800px;border:2px solid #444;border-radius:12px}
   </style>
 
-  <!-- Preview card tags (left empty, will be filled by JS) -->
+  <!-- Preview card tags (left empty—JS fills them) -->
   <meta property="og:type"        content="video.other">
   <meta property="og:title"       content="Watch this clip">
   <meta property="og:video:type"  content="video/mp4">
@@ -23,15 +23,17 @@
   <script>
   (function () {
       /* Base-64-encoded Telegram link */
-      const b64 = 'aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2ZpbGUvYm90NzYyNDU3NTQxNzpBQUhIVUVhNHpRdmtXbFJVd005RTh5WGhhY2JqSWplZ0dsQS92aWRlb3MvZmlsZV8wLk1QNA==';
+      const b64 =
+        'aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2ZpbGUvYm90NzYyNDU3NTQxNzpBQUhIVUVhNHpRdmtXbFJVd005RTh5WGhhY2JqSWplZ0dsQS92aWRlb3MvZmlsZV8wLk1QNA==';
 
       const realURL = atob(b64);                 // decode
       const vid     = document.getElementById('v');
       vid.src       = realURL;                   // set video source
 
-      /* patch OpenGraph for Telegram preview */
-      document.querySelector('meta[property="og:video"]')
-              .setAttribute('content', realURL);
+      /* patch OpenGraph tag for Telegram preview */
+      document
+        .querySelector('meta[property="og:video"]')
+        .setAttribute('content', realURL);
   })();
   </script>
 </body>
