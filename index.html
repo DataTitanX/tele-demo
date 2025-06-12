@@ -1,8 +1,41 @@
 <!doctype html>
 <html>
-<body style="text-align:center;background:#111;color:#eee">
-  <h2>Telegram-CDN test</h2>
-  <video controls width="600"
-         src="https://api.telegram.org/file/bot7624575417:AAHHUEa4zQvkWlRUwM9E8yXhacbjIjegGlA/videos/file_0.MP4"></video>
+<head>
+  <meta charset="utf-8">
+  <title>Telegram video</title>
+
+  <!-- Basic styling -->
+  <style>
+    body   {background:#111;color:#eee;text-align:center;font-family:sans-serif}
+    video  {width:100%;max-width:800px;border:2px solid #444;border-radius:12px}
+  </style>
+
+  <!-- Optional preview card tags (Telegram reads OpenGraph) -->
+  <meta property="og:type"       content="video.other">
+  <meta property="og:title"      content="Watch this clip">
+  <meta property="og:video:type" content="video/mp4">
+  <meta property="og:video"      content=""> <!-- will be filled by JS -->
+</head>
+
+<body>
+  <h2>Telegram-CDN demo (URL obfuscated)</h2>
+  <video id="v" controls></video>
+
+  <script>
+  (function () {
+      /* Base-64-encoded Telegram CDN link */
+      const b64 =
+        'aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2ZpbGUvYm90NzYyNDU3NTQxNzpBQUhIVUVhNHpRdmtXbFJVd005RTh5WGhhY2JqSWplZ0dsQS92aWRlb3MvZmlsZV8wLk1QNA==';
+
+      /* Decode and insert into <video> tag */
+      const realURL = atob(b64);
+      const vid     = document.getElementById('v');
+      vid.src       = realURL;
+
+      /* Also patch OpenGraph tag for nicer Telegram preview */
+      const og = document.querySelector('meta[property="og:video"]');
+      if (og) og.setAttribute('content', realURL);
+  })();
+  </script>
 </body>
 </html>
