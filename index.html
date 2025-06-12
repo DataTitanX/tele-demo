@@ -1,40 +1,30 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Telegram videov4</title>
+<!doctype html><meta charset="utf-8">
+<body style="background:#111;color:#eee;text-align:center">
+<h2>Segment-shuffler demo</h2>
+<video id="v" controls autoplay></video>
+<script>
+(async ()=>{
+  const worker = 'https://bal42.slide.workers.dev';  // your Worker
+  const m = await (await fetch(worker+'/m')).json();  // {total:1000}
+  const keyHex = '{{KEY}}';                          // paste key
+  const key = await crypto.subtle.importKey(
+      'raw', Uint8Array.from(keyHex.match(/../g).map(h=>parseInt(h,16))),
+      'AES-CTR', false, ['decrypt']);
 
-  <style>
-    body   {background:#111;color:#eee;text-align:center;font-family:sans-serif}
-    video  {width:100%;max-width:800px;border:2px solid #444;border-radius:12px}
-  </style>
+  const media = new MediaSource();
+  document.getElementById('v').src = URL.createObjectURL(media);
 
-  <!-- Preview card tags (left empty—JS fills them) -->
-  <meta property="og:type"        content="video.other">
-  <meta property="og:title"       content="Watch this clip">
-  <meta property="og:video:type"  content="video/mp4">
-  <meta property="og:video"       content="">
-</head>
-
-<body>
-  <h2>Telegram-CDN demo (URL obfuscated) v4</h2>
-  <video id="v" controls></video>
-
-  <script>
-  (function () {
-      /* Base-64-encoded Telegram link */
-      const b64 =
-        'aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2ZpbGUvYm90NzYyNDU3NTQxNzpBQUhIVUVhNHpRdmtXbFJVd005RTh5WGhhY2JqSWplZ0dsQS92aWRlb3MvZmlsZV8wLk1QNA==';
-
-      const realURL = atob(b64);                 // decode
-      const vid     = document.getElementById('v');
-      vid.src       = realURL;                   // set video source
-
-      /* patch OpenGraph tag for Telegram preview */
-      document
-        .querySelector('meta[property="og:video"]')
-        .setAttribute('content', realURL);
-  })();
-  </script>
-</body>
-</html>
+  media.addEventListener('sourceopen', async ()=>{
+    const sb = media.addSourceBuffer('video/mp4; codecs="avc1.64001f"');
+    for (let i=0;i<m.total;i++){
+      const resp = await fetch(`${worker}/c?n=`+i);
+      const enc  = new Uint8Array(await resp.arrayBuffer());
+      const dec  = new Uint8Array(await crypto.subtle.decrypt(
+         {name:'AES-CTR', counter:new Uint8Array(16), length:64}, key, enc));
+      sb.appendBuffer(dec);
+      await new Promise(res=>sb.addEventListener('updateend',res,{once:true}));
+    }
+    media.endOfStream();
+  });
+})();
+</script>
